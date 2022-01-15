@@ -1,0 +1,11 @@
+{
+     "type": "record",
+     "namespace": "br.com.estudo.springkafka",
+     "name": "Mensagem",
+     "version": "1",
+     "fields": [
+       { "name": "remetente", "type": "string", "doc": "Remetente da mensagem" },
+       { "name": "destinatario", "type": "string", "doc": "Destinatário da mensagem" },
+       { "name": "corpo", "type": "string", "doc": "Corpo com a mensagem a ser enviada" }
+     ]
+}

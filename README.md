@@ -21,4 +21,7 @@ kafka-console-consumer --bootstrap-server kafka:29092 --topic <TOPIC_NAME>
 
 # cria uma mensagem via requesição HTTP
 curl  http://localhost:8080/api/v1/enviar/<MENSAGEM>
+
+# cria a classe Mensagem de acordo com o avro
+mvn clean install
 ```
