@@ -18,4 +18,7 @@ kafka-console-producer --broker-list kafka:29092 --topic <TOPIC_NAME>
 
 # cria um consumer na linha de comando
 kafka-console-consumer --bootstrap-server kafka:29092 --topic <TOPIC_NAME>
+
+# cria uma mensagem via requesição HTTP
+curl  http://localhost:8080/api/v1/enviar/<MENSAGEM>
 ```
