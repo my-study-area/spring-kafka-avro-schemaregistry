@@ -18,4 +18,17 @@ public class EndPointController {
         producer.enviarMensagem(mensagem);
         return ResponseEntity.ok("Mensagem enviada");
     }
+
+    @GetMapping("/enviar/")
+    public ResponseEntity<?> enviarMensagemAvro(@RequestParam String remetente,
+                                                @RequestParam String destinatario,
+                                                @RequestParam String mensagem) {
+        Mensagem mensagemAvro = Mensagem.newBuilder()
+                .setRemetente(remetente)
+                .setDestinatario(destinatario)
+                .setCorpo(mensagem)
+                .build();
+        producer.enviarMensagemAvro(mensagemAvro);
+        return ResponseEntity.ok("Mensagem avro enviada");
+    }
 }

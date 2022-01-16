@@ -24,4 +24,7 @@ curl  http://localhost:8080/api/v1/enviar/<MENSAGEM>
 
 # cria a classe Mensagem de acordo com o avro
 mvn clean install
+
+#cria uma mensagem avro
+curl  "http://localhost:8080/api/v1/enviar/?remetente=adriano&destinatario=maria&mensagem=mensagem1" -v
 ```

@@ -13,14 +13,26 @@ public class TopicoProducer {
     @Value("${topic.name.producer}")
     private String topicName;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    @Value("${topic.name.producer.avro}")
+    private String topicNameAvro;
 
-    public TopicoProducer(KafkaTemplate<String, String> kafkaTemplate) {
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, Mensagem> kafkaTemplateAvro;
+
+    public TopicoProducer(KafkaTemplate<String, String> kafkaTemplate,
+                          KafkaTemplate<String, Mensagem> kafkaTemplateAvro) {
         this.kafkaTemplate = kafkaTemplate;
+        this.kafkaTemplateAvro = kafkaTemplateAvro;
     }
 
     public void enviarMensagem(String mensagem) {
         kafkaTemplate.send(topicName, mensagem);
         logger.info("Mensagem {} enviada", mensagem);
     }
+
+    public void enviarMensagemAvro(Mensagem mensagem) {
+        kafkaTemplateAvro.send(topicNameAvro, mensagem.getRemetente().toString(), mensagem);
+        logger.info("Mensagem {} enviada", mensagem);
+    }
+
 }
