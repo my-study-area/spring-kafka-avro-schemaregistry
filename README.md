@@ -28,3 +28,46 @@ mvn clean install
 #cria uma mensagem avro
 curl  "http://localhost:8080/api/v1/enviar/?remetente=adriano&destinatario=maria&mensagem=mensagem1" -v
 ```
+
+## Configuração de consumer via código
+```java
+@EnableKafka
+@Configuration
+public class KafkaConfig {
+    @Value("${spring.kafka.consumer.bootstrap-servers}")
+    private String bootstrap;
+
+    @Value("${spring.kafka.consumer.group-id}")
+    private String groupId;
+
+    @Bean
+    public ConsumerFactory<String, Mensagem> consumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrap);
+        props.put(
+                ConsumerConfig.GROUP_ID_CONFIG,
+                groupId);
+        props.put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class);
+        props.put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroDeserializer.class);
+        props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://0.0.0.0:8085");
+        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, "true");
+
+        System.out.println(props.toString());
+
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Mensagem> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Mensagem> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+
+}
+```
