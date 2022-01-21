@@ -1,6 +1,6 @@
-# springkafka
+# spring-kafka-avro-schemaregistry
 
-Projeto de estudo de Kafka com Spring
+Projeto de estudo de Kafka com Spring, Avro e Shema Registry
 
 ## Anotações
 ```
@@ -27,6 +27,9 @@ mvn clean install
 
 #cria uma mensagem avro
 curl  "http://localhost:8080/api/v1/enviar/?remetente=adriano&destinatario=maria&mensagem=mensagem1" -v
+
+curl -v -G -d 'remetente=adriano' -d 'destinatario=maria' \
+-d 'mensagem=mensagem1' "http://localhost:8080/api/v1/enviar/"
 ```
 
 ## Configuração de consumer via código
@@ -52,7 +55,8 @@ public class KafkaConfig {
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
         props.put(
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroDeserializer.class);
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                io.confluent.kafka.serializers.KafkaAvroDeserializer.class);
         props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://0.0.0.0:8085");
         props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, "true");
 
@@ -62,7 +66,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Mensagem> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, Mensagem>
+                                          kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Mensagem> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
