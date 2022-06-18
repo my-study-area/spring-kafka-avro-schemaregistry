@@ -3,21 +3,30 @@
 Projeto de estudo de Kafka com Spring, Avro e Shema Registry
 
 ## Anotações
-```
+```bash
 # inicia container kafka
 docker-compose up -d
 
 # acessa o terminal do kafka
 docker-compose run --rm kafka bash
 
-# lista os tópicos kafka
+# lista os tópicos kafka no container kafka
 kafka-topics --zookeeper zookeeper:2181 --list
 
-# cria um producer na linha de comando
+# cria um producer na linha de comando no container kafka
 kafka-console-producer --broker-list kafka:29092 --topic <TOPIC_NAME>
 
-# cria um consumer na linha de comando
-kafka-console-consumer --bootstrap-server kafka:29092 --topic <TOPIC_NAME>
+# cria um consumer na linha de comando no container kafka
+kafka-console-consumer --bootstrap-server kafka:29092 \
+--topic <TOPIC_NAME> --from-beginning
+
+# acessa o console do container schemaregistry
+docker-compose exec schemaregistry bash
+
+# consome mensagens avro no container schemaregistry
+kafka-avro-console-consumer --bootstrap-server kafka:29092 \
+--topic topic3 --property schema.registry.url=http://schemaregistry:8085 \
+--from-beginning
 
 # cria uma mensagem via requesição HTTP
 curl  http://localhost:8080/api/v1/enviar/<MENSAGEM>
@@ -26,7 +35,8 @@ curl  http://localhost:8080/api/v1/enviar/<MENSAGEM>
 mvn clean install
 
 #cria uma mensagem avro
-curl  "http://localhost:8080/api/v1/enviar/?remetente=adriano&destinatario=maria&mensagem=mensagem1" -v
+curl  "http://localhost:8080/api/v1/enviar/"\
+"?remetente=adriano&destinatario=maria&mensagem=mensagem1" -v
 
 curl -v -G -d 'remetente=adriano' -d 'destinatario=maria' \
 -d 'mensagem=mensagem1' "http://localhost:8080/api/v1/enviar/"
