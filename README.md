@@ -16,6 +16,17 @@ kafka-topics --zookeeper zookeeper:2181 --list
 # cria um producer na linha de comando no container kafka
 kafka-console-producer --broker-list kafka:29092 --topic <TOPIC_NAME>
 
+# cria um producer na enviar key e value na mensagem
+kafka-console-producer --broker-list kafka:29092 \
+--topic <TOPIC_NAME> --property "parse.key=true" --property "key.separator=;"
+
+# exemplo de mensagem enviada com key e value para producer acima
+{key: 1};{"nome": "Maria", "idade": 23}
+
+# cri consumer para exibir key e value
+kafka-console-consumer --bootstrap-server kafka:29092 --topic <TOPIC_NAME> \
+--from-beginning --property print.key=true --property print.value=true
+
 # cria um consumer na linha de comando no container kafka
 kafka-console-consumer --bootstrap-server kafka:29092 \
 --topic <TOPIC_NAME> --from-beginning
