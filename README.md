@@ -97,3 +97,53 @@ public class KafkaConfig {
 
 }
 ```
+
+## Exemplo de tópico Kafka com multiplos schemas
+Na linha de comando:
+```bash
+# inicia container kafka
+docker-compose -f docker-compose2.yaml up -d
+
+docker-compose -f docker-compose2.yaml exec fast-data-dev bash
+
+
+kafka-avro-console-producer \
+  --broker-list localhost:9092 \
+  --topic mykafkatopic \
+  --property value.schema.registry.url=http://localhost:8081 \
+  --property value.schema='{"type":"record","name":"User","namespace":"io.karengryg","fields":[{"name":"first_name","type":"string","doc":"FirstNameofUser"},{"name":"last_name","type":"string","doc":"LastNameofUser"}],"version":"1"}' \
+    --property key.schema='{"type":"record","name":"Header","fields":[{"name":"timestamp","type":"long"}]}' \
+  --property parse.key=true \
+  --property key.separator=, \
+  --property value.subject.name.strategy=io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
+
+
+{"timestamp":1637000000000},{"first_name": "Maria", "last_name": "Santos"}
+
+kafka-avro-console-producer \
+  --broker-list localhost:9092 \
+  --topic mykafkatopic \
+  --property value.schema.registry.url=http://localhost:8081 \
+  --property value.schema='{"type":"record","namespace":"io.karengryg","name":"Movie","version":"1","fields":[{"name":"movie_name","type":"string","doc":"NameofMovie"},{"name":"genre","type":"string","doc":"GenreofMovie"}]}' \
+    --property key.schema='{"type":"record","name":"Header","fields":[{"name":"timestamp","type":"long"}]}' \
+  --property parse.key=true \
+  --property key.separator=, \
+  --property value.subject.name.strategy=io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
+
+{"timestamp":1637000000000},{"movie_name": "A ida dos que não foram", "genre": "terror"}
+
+
+
+kafka-avro-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic mykafkatopic \
+  --from-beginning \
+  --property schema.registry.url=http://localhost:
+```
+
+Código java
+> Execute a classe `src/main/java/br/com/estudo/springkafka/KafkaAvroCustomProducer.java`
+
+Para validar acesse [http://localhost:3030/](http://localhost:3030/) e verifique as mensagens recebidas no tópico ***mykafkatopic***
+
+Fonte: [https://karengryg.io/2018/08/18/multi-schemas-in-one-kafka-topic/](https://karengryg.io/2018/08/18/multi-schemas-in-one-kafka-topic/)
