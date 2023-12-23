@@ -102,11 +102,11 @@ public class KafkaConfig {
 Na linha de comando:
 ```bash
 # inicia container kafka
-docker-compose -f docker-compose2.yaml up -d
+docker-compose -f docker-compose2.yml up -d
 
-docker-compose -f docker-compose2.yaml exec fast-data-dev bash
+docker-compose -f docker-compose2.yml exec fast-data-dev bash
 
-
+# cria producer para schema User
 kafka-avro-console-producer \
   --broker-list localhost:9092 \
   --topic mykafkatopic \
@@ -117,9 +117,10 @@ kafka-avro-console-producer \
   --property key.separator=, \
   --property value.subject.name.strategy=io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
 
-
+# mensagem para enviar no producer do schema User
 {"timestamp":1637000000000},{"first_name": "Maria", "last_name": "Santos"}
 
+# cria producer para schema Movie
 kafka-avro-console-producer \
   --broker-list localhost:9092 \
   --topic mykafkatopic \
@@ -130,15 +131,15 @@ kafka-avro-console-producer \
   --property key.separator=, \
   --property value.subject.name.strategy=io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
 
+# mensagem para enviar no producer do schema Movie
 {"timestamp":1637000000000},{"movie_name": "A ida dos que não foram", "genre": "terror"}
 
-
-
+# cria consumer para visualização das mensagens
 kafka-avro-console-consumer \
   --bootstrap-server localhost:9092 \
   --topic mykafkatopic \
   --from-beginning \
-  --property schema.registry.url=http://localhost:
+  --property schema.registry.url=http://localhost:8081
 ```
 
 Código java
