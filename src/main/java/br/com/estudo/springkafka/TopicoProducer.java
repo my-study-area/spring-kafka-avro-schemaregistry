@@ -20,26 +20,27 @@ public class TopicoProducer {
     private String topicNameAvro;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final KafkaTemplate<String, Mensagem> kafkaTemplateAvro;
+    private final KafkaTemplate<Key, Mensagem> kafkaTemplateAvro;
 
     public TopicoProducer(KafkaTemplate<String, String> kafkaTemplate,
-                          KafkaTemplate<String, Mensagem> kafkaTemplateAvro) {
+                          KafkaTemplate<Key, Mensagem> kafkaTemplateAvro) {
         this.kafkaTemplate = kafkaTemplate;
         this.kafkaTemplateAvro = kafkaTemplateAvro;
     }
 
     public void enviarMensagem(String mensagem) {
-        kafkaTemplate.send(topicName, mensagem);
+        String key = UUID.randomUUID().toString();
+        kafkaTemplate.send(topicName, key, mensagem);
         logger.info("Mensagem {} enviada", mensagem);
     }
 
     public void enviarMensagemAvro(Mensagem mensagem) {
-//        kafkaTemplateAvro.send(topicNameAvro, mensagem.getRemetente().toString(), mensagem);
-        String key = UUID.randomUUID().toString();
-        ProducerRecord<String, Mensagem> producerRecord = new ProducerRecord<>(key, mensagem);
-//        kafkaTemplateAvro.send(producerRecord);
-        kafkaTemplateAvro.setDefaultTopic(topicNameAvro);
-        kafkaTemplateAvro.sendDefault(key, mensagem);
+        Key key = Key.newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCorrelationId(UUID.randomUUID().toString())
+                .build();
+        ProducerRecord<Key, Mensagem> producerRecord = new ProducerRecord<>(topicNameAvro,key, mensagem);
+        kafkaTemplateAvro.send(producerRecord);
         logger.info("Mensagem {} enviada", mensagem);
         logger.info("ProducerRecord enviado: {}", producerRecord);
     }

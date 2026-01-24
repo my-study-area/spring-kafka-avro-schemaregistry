@@ -1,0 +1,10 @@
+{
+     "type": "record",
+     "namespace": "br.com.estudo.springkafka",
+     "name": "Key",
+     "version": "1",
+     "fields": [
+       { "name": "id", "type": "string", "doc": "Identificador da mensagem" },
+       { "name": "correlationId", "type": "string", "doc": "Correlation id" }
+     ]
+}

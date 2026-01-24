@@ -13,18 +13,19 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.UUID;
 
 
 public class KafkaAvroCustomProducer {
-    private static final String TOPIC = "mykafkatopic";
+    private static final String TOPIC = "topic-multi-schema-movies-and-users";
 
     public static void main(String[] args) throws IOException {
         //Kafka producer properties
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "127.0.0.1:9092");
-        properties.setProperty("key.serializer", StringSerializer.class.getName());
+        properties.setProperty("key.serializer", KafkaAvroSerializer.class.getName());
         properties.setProperty("value.serializer", KafkaAvroSerializer.class.getName());
-        properties.setProperty("schema.registry.url", "http://127.0.0.1:8081");
+        properties.setProperty("schema.registry.url", "http://127.0.0.1:8085");
 
         //Set value for new property
         properties.setProperty("value.subject.name.strategy", TopicRecordNameStrategy.class.getName());
@@ -36,11 +37,19 @@ public class KafkaAvroCustomProducer {
         GenericRecord movieAvroPayload = createMovieAvroPayload();
 
         //Create kafka producer and set properties
-        Producer<String, GenericRecord> producer = new KafkaProducer<>(properties);
+        Producer<Key, GenericRecord> producer = new KafkaProducer<>(properties);
 
         //Create 2 kafka messages
-        ProducerRecord<String, GenericRecord> userAvroRecord = new ProducerRecord<>(TOPIC, userAvroPayload);
-        ProducerRecord<String, GenericRecord> movieAvroRecord = new ProducerRecord<>(TOPIC, movieAvroPayload);
+        Key keyUser = Key.newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCorrelationId(UUID.randomUUID().toString())
+                .build();
+        Key keyMovie = Key.newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCorrelationId(UUID.randomUUID().toString())
+                .build();
+        ProducerRecord<Key, GenericRecord> userAvroRecord = new ProducerRecord<>(TOPIC, keyUser, userAvroPayload);
+        ProducerRecord<Key, GenericRecord> movieAvroRecord = new ProducerRecord<>(TOPIC, keyMovie,movieAvroPayload);
 
         //Send both messages to kafka
         producer.send(movieAvroRecord);
