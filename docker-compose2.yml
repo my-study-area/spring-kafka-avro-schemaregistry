@@ -1,13 +1,36 @@
-version: '3.7'
-
 services:
   fast-data-dev:
     image: landoop/fast-data-dev:3.3
+    hostname: fast-data-dev
+    container_name: fast-data-dev
     ports:
       - "2181:2181"
       - "3030:3030"
-      - "8081-8083:8081-8083"
-      - "9581-9585:9581-9585"
+      - "8085:8081"
+      - "8082:8082"
+      - "8083:8083"
       - "9092:9092"
     environment:
-      ADV_HOST: 127.0.0.1
+      ADV_HOST: fast-data-dev
+      RUNTESTS: 0
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,DOCKERCOMPOSE://0.0.0.0:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,DOCKERCOMPOSE://fast-data-dev:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKERCOMPOSE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKERCOMPOSE
+
+  akhq:
+    image: tchiotludo/akhq:0.26.0
+    depends_on:
+      - fast-data-dev
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka:
+              properties:
+                # O AKHQ usa a porta INTERNA 19092
+                bootstrap.servers: "fast-data-dev:19092"
+              schema-registry:
+                url: "http://fast-data-dev:8081"
+    ports:
+      - "9000:8080"

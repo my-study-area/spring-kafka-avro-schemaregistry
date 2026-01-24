@@ -1,4 +1,3 @@
-version: '3'
 services:
 
   zookeeper:
@@ -22,14 +21,19 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    restart: "no"
-    ports:
-      - "9000:9000"
+  akhq:
+    image: tchiotludo/akhq:0.26.0
     environment:
-      KAFKA_BROKERCONNECT: "kafka:29092"
-      SCHEMAREGISTRY_CONNECT: "http://schemaregistry:8085"
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka:
+              schema-registry:
+                url: "http://schemaregistry:8085"
+              properties:
+                bootstrap.servers: "kafka:29092"
+    ports:
+      - "9000:8080"
     depends_on:
       - kafka
 
