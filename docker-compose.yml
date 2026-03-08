@@ -64,3 +64,34 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
       DYNAMIC_CONFIG_ENABLED: 'true'
+
+  kafka-setup:
+    image: alpine:latest
+    container_name: kafka-setup
+    depends_on:
+      - schema-registry
+    volumes:
+      - ./src/main/resources/avro:/avro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        apk add --no-cache curl jq
+        
+        echo "Aguardando Schema Registry em http://schema-registry:8081..."
+        while [ $$(curl -s -o /dev/null -w %{http_code} http://schema-registry:8081) -ne 200 ]; do
+          sleep 2
+        done
+
+        echo "Registrando Schema para o tópico task-management.task-created.v1..."
+        
+        SCHEMA_CONTENT=$$(cat /avro/task_created.avsc | jq -c .)
+        PAYLOAD=$$(jq -n --arg sc "$$SCHEMA_CONTENT" '{schema: $$sc}')
+        
+        curl -X POST -H "Content-Type: application/vnd.schemaRegistry.v1+json" \
+          -d "$$PAYLOAD" \
+          http://schema-registry:8081/subjects/task-management.task-created.v1-value/versions
+        
+        echo -e "\nSchema registrado com sucesso no Subject: task-management.task-created.v1-value"
+
+
