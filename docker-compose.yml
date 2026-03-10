@@ -85,13 +85,24 @@ services:
 
         echo "Registrando Schema para o tópico task-management.task-created.v1..."
         
-        SCHEMA_CONTENT=$$(cat /avro/task_created.avsc | jq -c .)
-        PAYLOAD=$$(jq -n --arg sc "$$SCHEMA_CONTENT" '{schema: $$sc}')
+        SCHEMA_CREATED=$$(cat /avro/task_created.avsc | jq -c .)
+        PAYLOAD_CREATED=$$(jq -n --arg sc "$$SCHEMA_CREATED" '{schema: $$sc}')
         
         curl -X POST -H "Content-Type: application/vnd.schemaRegistry.v1+json" \
-          -d "$$PAYLOAD" \
+          -d "$$PAYLOAD_CREATED" \
           http://schema-registry:8081/subjects/task-management.task-created.v1-value/versions
         
         echo -e "\nSchema registrado com sucesso no Subject: task-management.task-created.v1-value"
+
+        echo "Registrando Schema para o tópico task-management.task-processed.v1..."
+        
+        SCHEMA_PROCESSED=$$(cat /avro/task_processed.avsc | jq -c .)
+        PAYLOAD_PROCESSED=$$(jq -n --arg sc "$$SCHEMA_PROCESSED" '{schema: $$sc}')
+        
+        curl -X POST -H "Content-Type: application/vnd.schemaRegistry.v1+json" \
+          -d "$$PAYLOAD_PROCESSED" \
+          http://schema-registry:8081/subjects/task-management.task-processed.v1-value/versions
+        
+        echo -e "\nSchema registrado com sucesso no Subject: task-management.task-processed.v1-value"
 
 
