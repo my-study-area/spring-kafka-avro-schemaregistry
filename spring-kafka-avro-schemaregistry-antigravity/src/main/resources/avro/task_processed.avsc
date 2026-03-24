@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "TaskProcessedResponse",
+  "namespace": "com.company.gravity.avro",
+  "fields": [
+    {"name": "eventId", "type": "string"},
+    {"name": "transactionId", "type": "string"},
+    {"name": "correlationId", "type": "string"},
+    {"name": "timestamp", "type": "string"},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "TaskProcessedPayload",
+        "fields": [
+          {"name": "taskId", "type": ["null", "string"], "default": null},
+          {"name": "title", "type": "string"},
+          {"name": "status", "type": "string"},
+          {"name": "reason", "type": ["null", "string"], "default": null}
+        ]
+      }
+    }
+  ]
+}
