@@ -2,6 +2,12 @@
 
 Projeto de estudo de Kafka com Spring, Avro e Shema Registry
 
+
+Projetos:
+- kafka com avro e schemaregistry feito com antigravity: [link](./spring-kafka-avro-schemaregistry-antigravity/)
+
+
+
 ## Anotações
 ```bash
 # inicia container kafka
