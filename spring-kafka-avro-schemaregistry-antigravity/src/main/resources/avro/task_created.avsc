@@ -1,0 +1,21 @@
+{
+  "type": "record",
+  "name": "TaskCreatedAvro",
+  "namespace": "com.company.gravity.schema.avro",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "transactionId", "type": "string" },
+    { "name": "correlationId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "payload", "type": {
+        "type": "record",
+        "name": "TaskAvro",
+        "fields": [
+          { "name": "taskId", "type": "string" },
+          { "name": "title", "type": "string" },
+          { "name": "description", "type": "string" },
+          { "name": "status", "type": "string" }
+        ]
+    }}
+  ]
+}
